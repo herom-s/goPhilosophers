@@ -60,18 +60,20 @@ func philoLife(simu *simulation, currPhilo *philo, stop chan bool) {
 		}
 
 		currPhilo.leftFork.forkMu.Lock()
+		fmt.Printf("%d [philo %d] has taken a fork\n", timeSinceStart, currPhilo.id)
 		currPhilo.rightFork.forkMu.Lock()
+		fmt.Printf("%d [philo %d] has taken a fork\n", timeSinceStart, currPhilo.id)
+		fmt.Printf("%d [philo %d] eat\n", timeSinceStart, currPhilo.id)
 		select {
-			case <-stop:
-				currPhilo.leftFork.forkMu.Unlock()
-				currPhilo.rightFork.forkMu.Unlock()
-				return
-			case <-time.After(simu.eatTime):
+		case <-stop:
+			currPhilo.leftFork.forkMu.Unlock()
+			currPhilo.rightFork.forkMu.Unlock()
+			return
+		case <-time.After(simu.eatTime):
 		}
 		currPhilo.leftFork.forkMu.Unlock()
 		currPhilo.rightFork.forkMu.Unlock()
 		currPhilo.lastTimeEat = time.Now()
-		fmt.Printf("%d [philo %d] eat\n", timeSinceStart, currPhilo.id)
 		currPhilo.numTimesEated++
 
 		if currPhilo.numTimesEated == simu.numEatTimes {
@@ -80,12 +82,12 @@ func philoLife(simu *simulation, currPhilo *philo, stop chan bool) {
 
 		fmt.Printf("%d [philo %d] think\n", timeSinceStart, currPhilo.id)
 
-		select {
-			case <-stop:
-				return
-			case <-time.After(simu.sleepTime):
-		}
 		fmt.Printf("%d [philo %d] sleep\n", timeSinceStart, currPhilo.id)
+		select {
+		case <-stop:
+			return
+		case <-time.After(simu.sleepTime):
+		}
 	}
 }
 
